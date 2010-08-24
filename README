@@ -1,0 +1,22 @@
+PHP 5 class to assist with Authorize.net Customer Information Manager (CIM)
+
+Requires cURL and SimpleXML extensions in PHP 5
+
+Version 0.1 on 24 Aug 2010
+By Chris Blay (chris@meosphere.com)
+Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
+
+License: http://www.gnu.org/licenses/lgpl-3.0.txt GNU Lesser General Public License (LGPL)
+
+===========================================================
+
+I needed something to do CIM stuff in Zend Framework. I found the AuthNetCIM class but
+it was pretty old (didn't support some new methods/parameters) and very large
+
+I know this doesn't hold your hand as much but it will always work with new methods and
+parameters
+
+Also the documentation and error codes from authorize.net are pretty helpful with figuring
+out what you need to send. Maybe someone else will find this useful as well?
+
+-Chris
