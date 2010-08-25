@@ -21,7 +21,15 @@ class AuthDotNetCIM
 	private $transaction_key;
 	public $test_mode;
 	public $debug_mode;
+	public $direct_response_separator;
 	public $error;
+	
+	private static $response_fields = array('responseCode', 'responseSubcode', 'responseReasonCode', 'responseReasonText', 'authorizationCode',
+		'avsResponse', 'transactionId', 'invoiceNumber', 'description', 'amount', 'method', 'transactionType', 'customerId', 'firstName',
+		'lastName', 'company', 'address', 'city', 'state', 'zipCode', 'country', 'phone', 'fax', 'emailAddress', 'shipToFirstName',
+		'shipToLastName', 'shipToCompany', 'shipToAddress', 'shipToCity', 'shipToState', 'shipToZipCode', 'shipToCountry', 'tax', 'duty',
+		'freight', 'taxExempt', 'purchaseOrderNumber', 'md5Hash', 'cardCodeResponse', 'cardholderAuthenticationVerificationResponse',
+		'splitTenderId', 'requestedAmount', 'balanceOnCard', 'accountNumber', 'cardType');
 	
 	public function __construct($api_login_id, $transaction_key, $test_mode = false, $debug_mode = false)
 	{
@@ -29,6 +37,7 @@ class AuthDotNetCIM
 		$this->transaction_key = $transaction_key;
 		$this->test_mode = $test_mode;
 		$this->debug_mode = $debug_mode;
+		$this->direct_response_separator = '|';
 		$this->error = '';
 	}
 	
@@ -41,27 +50,27 @@ class AuthDotNetCIM
 		$xml->merchantAuthentication->name = $this->api_login_id;
 		$xml->merchantAuthentication->transactionKey = $this->transaction_key;
 		
-		// add arguments
-		$this->add_params($xml, $arguments[0]);
+		// add parameters
+		$this->addParams($xml, $arguments[0]);
 		
 		// return communication result
 		return $this->communicate($xml);
 	}
 	
-	private function add_params($xml, $array)
+	private function addParams($xml, $array)
 	{
 		// recursively add values from $array to $xml
 		foreach ($array as $param => $value) {
 			if (is_array($value)) {
 				$xml->addChild($param);
-				$this->add_params($xml->$param, $value);
+				$this->addParams($xml->$param, $value);
 			} else {
 				$xml->$param = $value;
 			}
 		}
 	}
 	
-	private function communicate(SimpleXMLElement $xml)
+	private function communicate($xml)
 	{
 		// determine proper url
 		if ($this->test_mode) {
@@ -81,12 +90,12 @@ class AuthDotNetCIM
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
 		$response = curl_exec($ch);
 		
 		// check for curl error
 		if ($response === false) {
-			$this->error = curl_error($ch)
+			$this->error = curl_error($ch);
 			return false;
 		}
 		
@@ -101,6 +110,11 @@ class AuthDotNetCIM
 			$this->error = $response;
 		}
 		
+		// look for a directResponse to parse
+		if (isset($xml->directResponse)) {
+			$this->parseDirectResponse($xml);
+		}
+		
 		// debug
 		$this->debug('"plain" response and "xml" response', $response, $xml);
 		
@@ -108,13 +122,21 @@ class AuthDotNetCIM
 		return $xml;
 	}
 	
+	private function parseDirectResponse($xml)
+	{
+		$input = explode($this->direct_response_separator, (string) $xml->directResponse);
+		foreach (self::$response_fields as $key => $name) {
+			$xml->response->$name = $input[$key];
+		}
+	}
+	
 	private function debug()
 	{
 		// vardump all the args passed in if in debug mode
 		if ($this->debug_mode) {
-			echo '[DEBUG]';
+			echo "\n\n[DEBUG]\n";
 			var_dump(func_get_args());
-			echo '[/DEBUG]';
+			echo "[/DEBUG]\n\n";
 		}
 	}
 }

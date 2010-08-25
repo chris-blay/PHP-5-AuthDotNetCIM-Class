@@ -41,31 +41,112 @@ $cim = new AuthDotNetCIM('api_auth_id', 'transaction_key', true, true);
 //   be returned and more information can be found
 //   in the public property $error
 
-# TODO you'll need to fill in these values
 
-$cim->createCustomerProfileRequest(array(
-	'refId' => '',
+// test creating customer profile
+
+$result = $cim->createCustomerProfileRequest(array(
 	'profile' => array(
-		'merchantCustomerId' => '',
-		'description' => '',
-		'email' => '',
+		'merchantCustomerId' => rand(1000000, 100000000),
 		'paymentProfiles' => array(
-			'customerType' => '',
 			'billTo' => array(
-				'firstName' => '',
-				'lastName' => '',
-				'company' => '',
-				'address' => '',
-				'city' => '',
-				'state' => '',
-				'zip' => '',
-				'country' => '',
-				'phoneNumber' => '',
-				'faxNumber' => '',
+				'firstName' => 'John',
+				'lastName' => 'Doe',
+				'address' => '1234 Street',
+				'city' => 'Seattle',
+				'state' => 'WA',
+				'zip' => '98101',
+			),
+			'payment' => array(
+				'creditCard' => array(
+					'cardNumber' => '4111111111111111',
+					'expirationDate' => '2025-01',
+				),
 			),
 		),
 	),
-	# it's so easy!
 ));
+
+if ($result === false) {
+	echo "Internal error creating customer profile\n";
+	var_dump($cim->error);
+	die("\n");
+} elseif ($result->messages->resultCode == 'Ok') {
+	echo "Created customer profile {$result->customerProfileId}\n\n";
+} else {
+	echo "Error creating customer profile\n";
+	var_dump($result);
+	die("\n");
+}
+
+$customerProfileId = (string) $result->customerProfileId;
+
+
+// test getting customer profile id
+
+$result = $cim->getCustomerProfileRequest(array(
+	'customerProfileId' => $customerProfileId,
+));
+
+if ($result === false) {
+	echo "Internal error getting customer profile $customerProfile\n";
+	var_dump($cim->error);
+	die("\n");
+} elseif ($result->messages->resultCode == 'Ok') {
+	echo "Got customer profile $customerProfileId\n";
+	var_dump($result->profile);
+	echo "\n";
+} else {
+	echo "Error getting customer profile $customerProfileId\n";
+	var_dump($result);
+	die("\n");
+}
+
+$customerPaymentProfileId = (string) $result->profile->paymentProfiles->customerPaymentProfileId;
+
+
+// test customer profile transaction
+
+$result = $cim->createCustomerProfileTransactionRequest(array(
+	'transaction' => array(
+		'profileTransAuthOnly' => array(
+			'amount' => '0.01',
+			'customerProfileId' => $customerProfileId,
+			'customerPaymentProfileId' => $customerPaymentProfileId,
+		),
+	),
+));
+
+if ($result === false) {
+	echo "Internal error creating customer profile transaction\n";
+	var_dump($cim->error);
+	die("\n");
+} elseif ($result->messages->resultCode == 'Ok') {
+	echo "Created customer profile transaction\n";
+	var_dump($result->response);
+	echo "\n";
+} else {
+	echo "Error creating customer profile transaction\n";
+	var_dump($result);
+	die("\n");
+}
+
+
+// test deleting customer profile
+
+$result = $cim->deleteCustomerProfileRequest(array(
+	'customerProfileId' => $customerProfileId,
+));
+
+if ($result === false) {
+	echo "Internal error deleting customer profile $customerProfileId\n";
+	var_dump($cim->error);
+	die("\n");
+} elseif ($result->messages->resultCode == 'Ok') {
+	echo "Deleted customer profile $customerProfileId\n\n";
+} else {
+	echo "Error deleting customer profile $customerProfileId\n";
+	var_dump($result);
+	die("\n");
+}
 
 
