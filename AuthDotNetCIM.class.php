@@ -5,11 +5,12 @@
  *
  * Requires cURL and SimpleXML extensions in PHP 5
  *
- * Version 0.1 on 24 Aug 2010
- * By Chris Blay (chris@meosphere.com)
+ * Version 0.2 on 25 Aug 2010
+ * By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
  * Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
  *
  * License: http://www.gnu.org/licenses/lgpl-3.0.txt GNU Lesser General Public License (LGPL)
+ * Website: http://github.com/chris-blay/PHP-5-AuthDotNetCIM-Class
  *
  * Please keep this header information here
  *
@@ -19,7 +20,7 @@ class AuthDotNetCIM
 {
 	private $api_login_id;
 	private $transaction_key;
-	public $test_mode;
+	private $test_mode;
 	public $debug_mode;
 	public $direct_response_separator;
 	public $error;

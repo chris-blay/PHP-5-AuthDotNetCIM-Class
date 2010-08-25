@@ -1,15 +1,16 @@
 <?php
 
 /**
- * Examples for PHP 5 class to assist with Authorize.net Customer Information Manager (CIM)
+ * Example for PHP 5 class to assist with Authorize.net Customer Information Manager (CIM)
  *
  * Requires cURL and SimpleXML extensions in PHP 5
  *
- * Version 0.1 on 24 Aug 2010
- * By Chris Blay (chris@meosphere.com)
+ * Version 0.2 on 25 Aug 2010
+ * By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
  * Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
  *
  * License: http://www.gnu.org/licenses/lgpl-3.0.txt GNU Lesser General Public License (LGPL)
+ * Website: http://github.com/chris-blay/PHP-5-AuthDotNetCIM-Class
  *
  * Please keep this header information here
  *
@@ -41,6 +42,8 @@ $cim = new AuthDotNetCIM('api_auth_id', 'transaction_key', true, true);
 //   be returned and more information can be found
 //   in the public property $error
 
+// you can change debug_mode and direct_response_separator
+//   via their respective public properties
 
 // test creating customer profile
 
@@ -105,6 +108,8 @@ $customerPaymentProfileId = (string) $result->profile->paymentProfiles->customer
 
 
 // test customer profile transaction
+//   notice that the class automatically parses the directResponse property
+//   into a more manageable 'response' property
 
 $result = $cim->createCustomerProfileTransactionRequest(array(
 	'transaction' => array(
