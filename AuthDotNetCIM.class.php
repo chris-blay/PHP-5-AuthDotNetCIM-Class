@@ -5,7 +5,7 @@
  *
  * Requires cURL and SimpleXML extensions in PHP 5
  *
- * Version 0.2 on 25 Aug 2010
+ * Version 0.3 on 26 Aug 2010
  * By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
  * Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
  *
@@ -23,8 +23,8 @@ class AuthDotNetCIM
 	private $test_mode;
 	public $debug_mode;
 	public $direct_response_separator;
-	public $error;
 	
+	// used to parse directResponse in transaction results
 	private static $response_fields = array('responseCode', 'responseSubcode', 'responseReasonCode', 'responseReasonText', 'authorizationCode',
 		'avsResponse', 'transactionId', 'invoiceNumber', 'description', 'amount', 'method', 'transactionType', 'customerId', 'firstName',
 		'lastName', 'company', 'address', 'city', 'state', 'zipCode', 'country', 'phone', 'fax', 'emailAddress', 'shipToFirstName',
@@ -32,6 +32,7 @@ class AuthDotNetCIM
 		'freight', 'taxExempt', 'purchaseOrderNumber', 'md5Hash', 'cardCodeResponse', 'cardholderAuthenticationVerificationResponse',
 		'splitTenderId', 'requestedAmount', 'balanceOnCard', 'accountNumber', 'cardType');
 	
+	// just save whatever gets passed in
 	public function __construct($api_login_id, $transaction_key, $test_mode = false, $debug_mode = false)
 	{
 		$this->api_login_id = $api_login_id;
@@ -39,9 +40,9 @@ class AuthDotNetCIM
 		$this->test_mode = $test_mode;
 		$this->debug_mode = $debug_mode;
 		$this->direct_response_separator = '|';
-		$this->error = '';
 	}
 	
+	// this gets called for every method
 	public function __call($name, $arguments)
 	{
 		// suppress warnings about the namespace
@@ -58,9 +59,10 @@ class AuthDotNetCIM
 		return $this->communicate($xml);
 	}
 	
+	// recursively add values from $array to $xml
+	//   used to add the array values to the xml object
 	private function addParams($xml, $array)
 	{
-		// recursively add values from $array to $xml
 		foreach ($array as $param => $value) {
 			if (is_array($value)) {
 				$xml->addChild($param);
@@ -71,6 +73,7 @@ class AuthDotNetCIM
 		}
 	}
 	
+	// send the xml object to authorize.net and return the resulting xml object
 	private function communicate($xml)
 	{
 		// determine proper url
@@ -96,8 +99,7 @@ class AuthDotNetCIM
 		
 		// check for curl error
 		if ($response === false) {
-			$this->error = curl_error($ch);
-			return false;
+			throw new Exception('curl had a problem: ' . curl_error($ch));
 		}
 		
 		// close curl handle
@@ -108,8 +110,11 @@ class AuthDotNetCIM
 		
 		// check for simplexml error
 		if ($xml === false) {
-			$this->error = $response;
+			throw new Exception('could not parse returned xml: ' . $response);
 		}
+		
+		// make the result code easier to get to
+		$xml->ok = ($xml->messages->resultCode == 'Ok');
 		
 		// look for a directResponse to parse
 		if (isset($xml->directResponse)) {
@@ -123,6 +128,7 @@ class AuthDotNetCIM
 		return $xml;
 	}
 	
+	// use the static response_fields array to make directResponse easier to get to
 	private function parseDirectResponse($xml)
 	{
 		$input = explode($this->direct_response_separator, (string) $xml->directResponse);
@@ -131,9 +137,9 @@ class AuthDotNetCIM
 		}
 	}
 	
+	// vardump all the args passed in if in debug mode
 	private function debug()
 	{
-		// vardump all the args passed in if in debug mode
 		if ($this->debug_mode) {
 			echo "\n\n[DEBUG]\n";
 			var_dump(func_get_args());
@@ -141,5 +147,4 @@ class AuthDotNetCIM
 		}
 	}
 }
-
 
