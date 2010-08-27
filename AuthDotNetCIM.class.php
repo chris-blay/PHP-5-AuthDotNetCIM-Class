@@ -5,7 +5,7 @@
  *
  * Requires cURL and SimpleXML extensions in PHP 5
  *
- * Version 0.3 on 26 Aug 2010
+ * Version 0.3.1 on 26 Aug 2010
  * By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
  * Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
  *
@@ -114,7 +114,9 @@ class AuthDotNetCIM
 		}
 		
 		// make the result code easier to get to
-		$xml->ok = ($xml->messages->resultCode == 'Ok');
+		if ($xml->messages->resultCode == 'Ok') {
+			$xml->ok = '';
+		}
 		
 		// look for a directResponse to parse
 		if (isset($xml->directResponse)) {

@@ -5,7 +5,7 @@
  *
  * Requires cURL and SimpleXML extensions in PHP 5
  *
- * Version 0.3 on 26 Aug 2010
+ * Version 0.3.1 on 26 Aug 2010
  * By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
  * Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
  *
