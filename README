@@ -2,23 +2,56 @@ PHP 5 class to assist with Authorize.net Customer Information Manager (CIM)
 
 Requires cURL and SimpleXML extensions in PHP 5
 
-Version 0.3.1 on 26 Aug 2010
+Version 0.4 on 29 Dec 2010
 By Chris Blay (chris@meosphere.com, chris.b.blay@gmail.com)
 Copyright (c) 2010 Meosphere (http://meosphere.com, http://meolabs.com)
 
-License: http://www.gnu.org/licenses/lgpl-3.0.txt GNU Lesser General Public License (LGPL)
+License: http://www.gnu.org/licenses/lgpl-3.0.txt
 Website: http://github.com/chris-blay/PHP-5-AuthDotNetCIM-Class
 
 ===========================================================
 
-I needed something to do CIM stuff in Zend Framework. I've found several classes but
-they are pretty old (don't support new methods/parameters), generally *very* large,
-and don't use extensions like SimpleXML as much as they could
+I needed something to do CIM stuff in Zend Framework. I've found several
+classes but they were pretty old (didn't support new methods/parameters),
+generally *very* large, and didn't use extensions like SimpleXML as much
+as they could have.
 
-I know this doesn't hold your hand as much but it will always work with new methods and
-parameters and it has a clean object-oriented interface
+I know this doesn't hold your hand as much but it will always work with
+new methods and parameters and it has a clean object-oriented interface.
 
-Also the documentation and error codes from authorize.net are pretty helpful with figuring
-out what you need to send. Maybe someone else will find this useful as well?
+The idea is that you can wrap this class with another one that is more suited
+for your needs. You could write a method that only takes a user object or id
+and the wrapper class builds out whatever information is needed for the call
+in this class.
+
+The documentation and error codes from authorize.net at
+	http://www.authorize.net/support/CIM_XML_guide.pdf
+is helpful with figuring out what methods are available and what parameters
+are required or accepted for each method.
+
+Maybe someone else will find this useful as well?
 
 -Chris
+
+===========================================================
+
+Version 0.3 on 26 Aug 2010
+
+	This was the first version that I felt was acceptable for use in
+	my own project. Basically feature complete. I didn't publish any versions
+	previous to this.
+
+Version 0.3.1 on 28 Aug 2010
+
+	This was a quick bug fix that corrected a problem with the $result->ok
+	shortcut always being true.
+
+Version 0.4 on 29 Dec 2010
+
+	This is an improvement to the class which removed all public variables
+	and modified how it is instantiated. Calls can leave off 'Request' and
+	it will be added automatically by the class. Cleaned up code to keep line
+	lengths short, be more careful with types, reduce number of internal
+	methods, and move more details into class variables. Added checks for
+	required PHP modules.
+
