@@ -11,6 +11,13 @@ Website: http://github.com/chris-blay/PHP-5-AuthDotNetCIM-Class
 
 ===========================================================
 
+PLEASE NOTE: Authorize.net has released an official PHP 5 SDK for all
+their APIs including the Customer Information Manager. I have since
+migrated my code to this new back-end SDK and no longer use this class.
+It was necessary at the time but should not be used anymore.
+
+===========================================================
+
 I needed something to do CIM stuff in Zend Framework. I've found several
 classes but they were pretty old (didn't support new methods/parameters),
 generally *very* large, and didn't use extensions like SimpleXML as much
